@@ -4,6 +4,7 @@
 // @version      0.1
 // @description  Duolingo reverse japanese tree helper
 // @author       t17dr
+// @homepage     http://www.t17dr.com
 // @include      https://www.duolingo.com/*
 // @require      http://code.jquery.com/jquery-latest.js
 // @require      https://rawgit.com/jeresig/jquery.hotkeys/master/jquery.hotkeys.js
@@ -61,7 +62,7 @@
             $("#api-prompt").hide(400);
         });
 
-        $("#nihonduo-api.ok").unbind();
+        $("#nihonduo-api-ok").unbind();
         $("#nihonduo-api-ok").bind("click", function(){
             var k = $("#nihonduo-key").val();
 
@@ -96,15 +97,20 @@
         }
     }
 
+    
     // When new voices are loaded, look if there is a sentence in backlog to read
-    window.speechSynthesis.onvoiceschanged = function() {
-        voicesLoaded = true;
-        if (waitingSentence !== "")
-        {
-            readJapanese(waitingSentence);
-            waitingSentence = "";
-        }
-    };
+    var isFF = navigator.userAgent.search("Firefox") > -1;
+    if (!isFF)                                                      // This is not supported on Firefox
+    {
+        window.speechSynthesis.onvoiceschanged = function() {
+            voicesLoaded = true;
+            if (waitingSentence !== "")
+            {
+                readJapanese(waitingSentence);
+                waitingSentence = "";
+            }
+        };
+    }
 
     $(document).bind('keydown', 'ctrl+space', readChallenge);
 
@@ -247,7 +253,7 @@
 
             if (canAppend)
             {
-                current.append("<span id=\"nihonduo-jisho\" class=\"btn btn-primary explain btn-small\">Jisho</span>");
+                current.append(" <span id=\"nihonduo-jisho\" class=\"btn btn-primary explain btn-small\">Jisho</span>");
 
                 var jisho = current.find("#nihonduo-jisho");
                 jisho.unbind();
@@ -344,8 +350,8 @@
         if (isJapanese(sentence) && !alreadyExists)
         {
             $(".text-to-translate").prepend("<span id=\"speak-japanese\" class=\"speaker-small\" style=\"margin-right: 20px\"><span class=\"icon icon-speaker-small \"></span></span>");
-            $("#speak-japanese").unbind();
-            $("#speak-japanese").bind("click", readChallenge);
+            $("#speak-japanese").off("click");
+            $("#speak-japanese").on("click", readChallenge);
         }
     }
 
