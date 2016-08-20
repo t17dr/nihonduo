@@ -8,6 +8,8 @@
 // @include      https://www.duolingo.com/*
 // @require      http://code.jquery.com/jquery-latest.js
 // @require      https://rawgit.com/jeresig/jquery.hotkeys/master/jquery.hotkeys.js
+// @downloadURL  https://github.com/t17dr/nihonduo/raw/master/Nihonduo.user.js
+// @updateURL    https://github.com/t17dr/nihonduo/raw/master/Nihonduo.user.js
 // @grant        none
 // ==/UserScript==
 
