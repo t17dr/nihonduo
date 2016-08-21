@@ -19,3 +19,5 @@ hiragana pronounciation. Follow the instructions in that popup.
 ## Known issues
 * Text-to-speech does not currently work on firefox
 * Text-to-speech plays again when going to the next question
+
+[<img src="http://u.xgoo.jp/img/sgoo.png" width="250">](http://www.goo.ne.jp/)
