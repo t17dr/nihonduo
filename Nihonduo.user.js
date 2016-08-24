@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Nihonduo
 // @namespace    none
-// @version      0.1.1
+// @version      0.1.2
 // @description  Duolingo reverse japanese tree helper
 // @author       t17dr
 // @homepage     http://www.t17dr.com
@@ -312,9 +312,14 @@
     // originalText: element content before appending
     function applyFurigana(data, parentElement, originalText)
     {
-        var original = originalText.split("|");
+        var original = originalText.split("|")[0];
 
-        parentElement.html(original[0] + "| <span style=\"color: #999;\">" + data.converted + "</span>");
+        if (original.toLowerCase().indexOf("jisho") != -1)
+        {
+            original = original.toLowerCase().replace("jisho", "");
+        }
+
+        parentElement.html(original + "| <span style=\"color: #999;\">" + data.converted + "</span>");
 
         // Apply jisho links AFTER furigana
         jisho();
