@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Nihonduo
 // @namespace    none
-// @version      0.1
+// @version      0.1.1
 // @description  Duolingo reverse japanese tree helper
 // @author       t17dr
 // @homepage     http://www.t17dr.com
@@ -33,6 +33,9 @@
 
     // The hiragana API key
     var key = "";
+
+    // Previous sentence to recognize transition to next challenge
+    var prevSentence = "";
 
     // Show a prompt to enter API key, call callback when the user clicks OK and pass the key as argument
     function showAPIkeyDialog(callback)
@@ -114,12 +117,14 @@
         };
     }
 
+    // Bind shortcut for TTS replay
     $(document).bind('keydown', 'ctrl+space', readChallenge);
 
     // Use text to speech to read a japanese sentence
     function readJapanese(sentence)
     {
-        if (!voicesLoaded)      // voices not yet loaded, add to backlog
+
+        if (!voicesLoaded)              // Voices not yet loaded, add to backlog
         {
             waitingSentence = sentence;
         } else if (canRead) {
@@ -274,7 +279,7 @@
             return;
         }
 
-        // Try to get the API key
+        // Try to get the API key from user or load from local storage
         showAPIkeyDialog(function(k){
             key = k;
         });
@@ -322,7 +327,7 @@
     }
     
     // Get current challenge sentence from the DOM
-    function getCurrentSentence()
+    function getCurrentSentence(afterTransition = false)
     {
         var sentence = "";
 
@@ -330,18 +335,37 @@
             sentence += $(this).text();
         });
 
+        // Delete any previous sentence from the beginning. I have no idea where this sometimes comes from.
+        if ( (prevSentence !== "") && afterTransition === true)
+        {
+            var prevSentenceRegex = new RegExp("^" + escapeRegex(prevSentence));
+            sentence = sentence.replace(prevSentenceRegex, "");
+        }    
+
         return sentence;
     }
 
     // Text to speech read the current challenge, if the original is in japanese
-    function readChallenge()
+    // Set isAutoplay to true if this is the automatic TTS at the start of a challenge
+    function readChallenge(isAutoplay = false)
     {
-        var sentence = getCurrentSentence();
+        var sentence = getCurrentSentence(isAutoplay);
         if (isJapanese(sentence))
         {
             sentence = sentence.replace(/[a-zA-Zé\?\!\.\,\'\;\:]*/, "");
+
+            if (isAutoplay === true && sentence === prevSentence)
+            {
+                return;                     // Do not read if this is the old sentence
+            }
             readJapanese(sentence);
+
+            if (isAutoplay)
+            {
+                prevSentence = sentence;
+            }
         }
+
     }
 
     function appendSpeakIcon()
@@ -382,6 +406,11 @@
 
         return true;
     }
+
+    function escapeRegex(str) 
+    {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    }
     
     var observer = new MutationObserver(function(mutations) {
         observer.disconnect();
@@ -394,8 +423,9 @@
 
             if (shouldSpeakOnChange(mutations))
             {
-                readChallenge();
+                readChallenge(true);
             }
+
             appendSpeakIcon();
 
         observer.observe(target, config);

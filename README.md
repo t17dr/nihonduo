@@ -18,4 +18,3 @@ hiragana pronounciation. Follow the instructions in that popup.
 
 ## Known issues
 * Text-to-speech does not currently work on firefox
-* Text-to-speech plays again when going to the next question
